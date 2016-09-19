@@ -17,3 +17,5 @@ Each library has a slightly different focus. reJ uses it's own API which is focu
 ---
 
 The project also included a very nice tutorial but in flash. You can find that in the /tutorial directory.
+
+**TL;DR**, yes you can use this tool to edit .class files. You do not even need to extract that .class file from a .jar file, rejava gladly open class files from a jar. The included tutorial is very much needed to understand how to use. But as a quick note, you should find the desired class to edit, then click on View -> check desired, e.g. Constant Pool
