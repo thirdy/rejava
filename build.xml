@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="reJ">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <property name="javadoc.dir" value="doc"/>
+    <property name="tests.dir" value="test"/>
+    <property name="classes.dir" value="classes"/>
+    <property name="distributable.version" value="0.8"/>
+
+    <path id="reJ.classpath">
+        <pathelement location="classes"/>
+        <pathelement location="lib/tools.jar"/>
+        <pathelement location="lib/junit-4.1.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${classes.dir}"/>
+    </target>
+
+    <target name="build">
+        <mkdir dir="${classes.dir}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="classes" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="reJ.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="classes" source="${source}" target="${target}">
+            <src path="test"/>
+            <classpath refid="reJ.classpath"/>
+        </javac>
+    </target>
+
+    <target name="execute">
+        <java classname="net.sf.rej.gui.MainWindow" failonerror="true" fork="yes">
+            <classpath refid="reJ.classpath"/>
+        </java>
+    </target>
+
+    <target name="clean_unit_tests">
+        <delete dir="${junit.output.dir}"/>
+    </target>
+
+    <target name="unit_tests" depends="clean_unit_tests,build">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${junit.output.dir}">
+                <fileset dir="${tests.dir}">
+                    <include name="**/*.java"/>
+                </fileset>
+            </batchtest>
+            <classpath refid="reJ.classpath"/>
+        </junit>
+    </target>
+
+    <target name="unit_test_report" depends="unit_tests">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+
+    <target name="clean_javadoc">
+        <delete dir="${javadoc.dir}"/>
+    </target>
+
+    <target name="javadoc" depends="clean_javadoc,build">
+        <javadoc access="public" author="true" classpath="lib/tools.jar" destdir="${javadoc.dir}" doctitle="reJ" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${source}" sourcepath="src" splitindex="true" use="true" version="true">
+            <packageset dir="src" defaultexcludes="yes">
+              <include name="net/sf/rej/**"/>
+              <exclude name="net/sf/rej/guineapigs"/>
+            </packageset>
+        </javadoc>
+    </target>
+
+    <target name="executable_jar" depends="build">
+        <!--
+        *rej.jar
+        -META-INF
+        -contents of classes
+        -contents of (and including) img
+         -->
+        <jar destfile="rej.jar" basedir=".">
+            <fileset dir="classes">
+                <include name="**/*.*"/>
+            </fileset>
+            <include name="img/**/*.*"/>
+            <manifest>
+                <attribute name="Main-Class" value="net.sf.rej.gui.MainWindow"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name ="src_zip">
+        <!--
+        *rej_vx.x_src.zip
+         -contents of (and including) src
+        -->
+        <property name="src_file" value="rej_v${distributable.version}_src.zip"/>
+        <zip destfile="${src_file}" basedir=".">
+            <include name="src/**/*.java"/>
+            <include name="test/**/*.java"/>
+        </zip>
+    </target>
+
+    <target name ="javadocs_zip" depends="javadoc">
+        <!--
+        *rej_vx.x_javadocs.zip
+         -contents of doc
+        -->
+        <property name="javadoc_file" value="rej_v${distributable.version}_javadocs.zip"/>
+        <zip destfile="${javadoc_file}" basedir="doc">
+            <include name="**/*.*"/>
+        </zip>
+    </target>
+
+    <target name ="bin_zip" depends="executable_jar">
+        <!--
+        *rej_v0.6_bin.zip
+         -rej.jar
+         -license.readme
+        -->
+        <property name="bin_file" value="rej_v${distributable.version}_bin.zip"/>
+        <zip destfile="${bin_file}" basedir=".">
+            <include name="rej.jar"/>
+            <include name="license.readme"/>
+        </zip>
+    </target>
+
+    <target name="distributables" depends="src_zip,javadocs_zip,bin_zip">
+    </target>
+
+</project>

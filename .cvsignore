@@ -1,0 +1,9 @@
+*.locatorcache
+rej.preferences
+rej.recentfiles
+rej.jar
+rej_v*.zip
+junit
+doc
+reJ.log.1
+classes
